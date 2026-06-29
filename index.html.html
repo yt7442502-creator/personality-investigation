@@ -1,0 +1,2030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personality Investigation Bureau</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Courier+Prime&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --lavender:#c9b6f0;
+    --lavender-deep:#a98ce0;
+    --pink:#ffc2dd;
+    --pink-deep:#ff9ec7;
+    --blue:#bcd4ff;
+    --white:#ffffff;
+    --ink:#4a3f63;
+    --ink-soft:#7a6f95;
+    --glass:rgba(255,255,255,0.55);
+    --glass-border:rgba(255,255,255,0.85);
+    --shadow:0 8px 32px rgba(150,120,200,0.25);
+    --shadow-lg:0 20px 60px rgba(150,120,200,0.35);
+    --radius:24px;
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Poppins',sans-serif;
+    min-height:100vh;
+    background:linear-gradient(135deg,#fbeaff 0%, #e8e6ff 40%, #ffe5f1 100%);
+    color:var(--ink);
+    overflow-x:hidden;
+    position:relative;
+    -webkit-tap-highlight-color: transparent;
+    user-select:none;
+    perspective:1200px;
+  }
+
+  /* ============ PARALLAX BLOB LAYER ============ */
+  .blob-field{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+  .blob{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(40px);
+    opacity:0.45;
+    transition:transform .4s ease-out;
+    animation:float 18s ease-in-out infinite;
+  }
+  .blob1{width:280px;height:280px;background:var(--lavender);top:-60px;left:-60px;animation-duration:20s;}
+  .blob2{width:340px;height:340px;background:var(--pink);bottom:-100px;right:-80px;animation-duration:24s;animation-delay:-4s;}
+  .blob3{width:220px;height:220px;background:var(--blue);top:40%;right:10%;animation-duration:16s;animation-delay:-8s;}
+  .blob4{width:180px;height:180px;background:var(--pink-deep);bottom:20%;left:8%;animation-duration:22s;animation-delay:-2s;}
+  @keyframes float{
+    0%,100%{transform:translate(0,0) scale(1);}
+    33%{transform:translate(30px,-40px) scale(1.08);}
+    66%{transform:translate(-20px,30px) scale(0.95);}
+  }
+
+  .particle{
+    position:fixed;
+    width:6px;height:6px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.8);
+    pointer-events:none;
+    z-index:1;
+    animation:drift linear infinite;
+  }
+  @keyframes drift{
+    0%{transform:translateY(0) translateX(0);opacity:0;}
+    10%{opacity:0.8;}
+    90%{opacity:0.6;}
+    100%{transform:translateY(-100vh) translateX(20px);opacity:0;}
+  }
+
+  /* mouse sparkle */
+  .sparkle{
+    position:fixed;
+    pointer-events:none;
+    z-index:1600;
+    border-radius:50%;
+    background:radial-gradient(circle, #fff, var(--pink-deep) 60%, transparent 100%);
+    animation:sparkleFade .7s ease-out forwards;
+  }
+  @keyframes sparkleFade{
+    0%{opacity:1;transform:scale(1) translateY(0);}
+    100%{opacity:0;transform:scale(0.2) translateY(-18px);}
+  }
+
+  .tilt-wrap{
+    transition:transform .15s ease-out;
+    transform-style:preserve-3d;
+  }
+
+  .app{position:relative;z-index:2;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+
+  .screen{
+    width:100%;
+    max-width:560px;
+    display:none;
+  }
+  .screen.active{display:block;animation:screenIn .6s var(--ease);}
+  @keyframes screenIn{
+    from{opacity:0;transform:translateY(24px) scale(0.98);}
+    to{opacity:1;transform:translateY(0) scale(1);}
+  }
+
+  .card{
+    background:var(--glass);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-lg);
+    padding:40px 36px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .card::before{
+    content:'';
+    position:absolute;
+    top:-50%;left:-50%;
+    width:200%;height:200%;
+    background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.4) 50%, transparent 60%);
+    pointer-events:none;
+    animation:sheen 6s ease-in-out infinite;
+  }
+  @keyframes sheen{
+    0%,100%{transform:translateX(-10%) translateY(-10%);}
+    50%{transform:translateX(10%) translateY(10%);}
+  }
+
+  .badge{
+    font-size:13px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  h1{
+    font-size:26px;
+    font-weight:800;
+    margin:4px 0 18px;
+    color:var(--ink);
+    line-height:1.3;
+  }
+  .magnify{font-size:42px;display:block;margin-bottom:10px;animation:bob 3s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-8px) rotate(4deg);}}
+
+  .case-row{
+    display:flex;
+    justify-content:space-between;
+    text-align:left;
+    background:rgba(255,255,255,0.5);
+    border-radius:14px;
+    padding:14px 18px;
+    margin:10px 0;
+    font-size:14px;
+  }
+  .case-row .label{color:var(--ink-soft);font-weight:500;}
+  .case-row .value{font-weight:700;color:var(--ink);}
+
+  .status-pending{color:#c98a2e;}
+  .status-progress{color:#3a7bd5;}
+  .status-closed{color:#3aa56a;}
+
+  .btn{
+    font-family:'Poppins',sans-serif;
+    border:none;
+    cursor:pointer;
+    border-radius:50px;
+    font-weight:600;
+    font-size:15px;
+    padding:14px 32px;
+    position:relative;
+    overflow:hidden;
+    transition:transform .25s var(--ease), box-shadow .25s var(--ease);
+    box-shadow:0 6px 20px rgba(170,130,220,0.35);
+    color:#fff;
+  }
+  .btn-primary{background:linear-gradient(135deg,var(--lavender-deep),var(--pink-deep));}
+  .btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 10px 28px rgba(170,130,220,0.45);}
+  .btn:active{transform:translateY(0) scale(0.97);}
+  .btn .ripple{
+    position:absolute;border-radius:50%;
+    background:rgba(255,255,255,0.6);
+    transform:scale(0);
+    animation:rippleAnim .6s ease-out;
+    pointer-events:none;
+  }
+  @keyframes rippleAnim{to{transform:scale(4);opacity:0;}}
+
+  .btn-row{display:flex;gap:14px;justify-content:center;margin-top:22px;flex-wrap:wrap;}
+  .btn-choice{
+    background:linear-gradient(135deg, var(--white), #f3eaff);
+    color:var(--ink);
+    border:2px solid rgba(180,150,230,0.4);
+    min-width:120px;
+  }
+  .btn-choice:hover{background:linear-gradient(135deg,var(--lavender),var(--pink));color:#fff;}
+
+  .loading-msg{
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink-soft);
+    min-height:24px;
+    margin:18px 0 14px;
+  }
+  .progress-track{
+    width:100%;
+    height:14px;
+    background:rgba(255,255,255,0.5);
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:inset 0 2px 6px rgba(150,120,200,0.2);
+  }
+  .progress-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--lavender-deep),var(--pink-deep));
+    border-radius:20px;
+    transition:width .3s ease-out;
+    position:relative;
+  }
+  .progress-fill::after{
+    content:'';
+    position:absolute;inset:0;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.6),transparent);
+    animation:shimmer 1.4s linear infinite;
+  }
+  @keyframes shimmer{0%{transform:translateX(-100%);}100%{transform:translateX(100%);}}
+  .progress-pct{margin-top:8px;font-size:13px;font-weight:600;color:var(--ink-soft);}
+
+  .q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .q-number{font-size:13px;font-weight:700;color:var(--lavender-deep);letter-spacing:.5px;}
+  .mini-track{width:120px;height:6px;background:rgba(255,255,255,0.5);border-radius:10px;overflow:hidden;}
+  .mini-fill{height:100%;background:linear-gradient(90deg,var(--lavender-deep),var(--pink-deep));border-radius:10px;transition:width .4s var(--ease);}
+  .q-text{font-size:21px;font-weight:700;margin:18px 0 6px;line-height:1.4;}
+  .q-icon{font-size:34px;margin-bottom:6px;display:block;}
+
+  .panel-box{
+    background:rgba(255,255,255,0.55);
+    border-radius:16px;
+    padding:16px 18px;
+    margin:16px 0;
+    text-align:left;
+    font-size:14px;
+  }
+  .witness-item, .ai-check-item{
+    display:flex;align-items:center;gap:10px;
+    padding:6px 0;
+    font-weight:500;
+  }
+  .check-icon{width:20px;text-align:center;}
+  .check-pending{color:#c98a2e;}
+  .check-done{color:#3aa56a;}
+
+  .legal-box{
+    background:linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,200,220,0.4));
+    border:2px dashed var(--pink-deep);
+    border-radius:16px;
+    padding:20px;
+    margin:16px 0;
+    text-align:left;
+    font-size:14px;
+    line-height:1.6;
+  }
+  .legal-title{font-weight:800;font-size:16px;margin-bottom:8px;}
+
+  .chase-area{
+    position:relative;
+    width:100%;
+    height:340px;
+    margin-top:10px;
+    overflow:hidden;
+    border-radius:18px;
+    background:rgba(255,255,255,0.3);
+  }
+  .chase-btn{
+    position:absolute;
+    font-family:'Poppins',sans-serif;
+    font-weight:700;
+    border:none;
+    border-radius:50px;
+    cursor:pointer;
+    transition:transform .35s var(--ease), left .35s var(--ease), top .35s var(--ease), width .35s var(--ease), height .35s var(--ease), font-size .35s var(--ease), background .35s ease;
+    box-shadow:0 8px 24px rgba(170,130,220,0.4);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  #infjBtn{
+    background:linear-gradient(135deg,#b8a4e8,#e8a4cc);
+    width:120px;height:56px;font-size:16px;
+    left:30%;top:40%;
+    z-index:5;
+  }
+  #infpBtn{
+    background:linear-gradient(135deg,var(--lavender-deep),var(--pink-deep));
+    width:120px;height:56px;font-size:16px;
+    left:60%;top:40%;
+    z-index:4;
+  }
+
+  /* toast variety: each gets a distinct entrance animation class */
+  .toast{
+    position:fixed;
+    top:24px;left:50%;
+    background:rgba(255,255,255,0.92);
+    backdrop-filter:blur(10px);
+    border-radius:16px;
+    padding:16px 22px;
+    box-shadow:var(--shadow-lg);
+    font-weight:600;
+    font-size:14px;
+    color:var(--ink);
+    max-width:90%;
+    text-align:center;
+    z-index:1000;
+    opacity:0;
+    border-left:5px solid var(--pink-deep);
+  }
+  .toast.show.t-drop{animation:toastDrop .5s var(--ease) forwards;}
+  .toast.show.t-pop{animation:toastPop .45s var(--ease) forwards;}
+  .toast.show.t-slide{animation:toastSlide .45s var(--ease) forwards;}
+  .toast.show.t-shake{animation:toastShake .5s var(--ease) forwards;}
+  .toast.show.t-flip{animation:toastFlip .55s var(--ease) forwards;}
+  .toast.hide{animation:toastOut .35s var(--ease) forwards;}
+  @keyframes toastDrop{0%{opacity:0;top:-60px;transform:translateX(-50%) scale(0.8);}60%{opacity:1;top:30px;}100%{opacity:1;top:24px;transform:translateX(-50%) scale(1);}}
+  @keyframes toastPop{0%{opacity:0;transform:translateX(-50%) scale(0.3) rotate(-8deg);}70%{transform:translateX(-50%) scale(1.08) rotate(2deg);}100%{opacity:1;transform:translateX(-50%) scale(1) rotate(0);}}
+  @keyframes toastSlide{0%{opacity:0;transform:translateX(-150%);}100%{opacity:1;transform:translateX(-50%);}}
+  @keyframes toastShake{0%{opacity:0;transform:translateX(-50%) translateY(-20px);}50%{opacity:1;transform:translateX(-50%) translateY(0);}60%{transform:translateX(-54%) translateY(0);}70%{transform:translateX(-46%) translateY(0);}80%{transform:translateX(-52%) translateY(0);}100%{transform:translateX(-50%) translateY(0);}}
+  @keyframes toastFlip{0%{opacity:0;transform:translateX(-50%) rotateX(-90deg);}100%{opacity:1;transform:translateX(-50%) rotateX(0);}}
+  @keyframes toastOut{to{opacity:0;transform:translateX(-50%) translateY(-16px) scale(0.92);}}
+
+  .achievement{
+    position:fixed;
+    bottom:24px;left:50%;
+    transform:translateX(-50%) translateY(40px);
+    background:linear-gradient(135deg, #fff8e8, #ffe9f3);
+    border-radius:16px;
+    padding:14px 22px;
+    box-shadow:var(--shadow-lg);
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    z-index:1000;
+    opacity:0;
+    transition:transform .45s var(--ease), opacity .45s var(--ease);
+    border:1px solid rgba(255,200,100,0.5);
+  }
+  .achievement.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .achievement .ico{font-size:22px;}
+
+  .sound-controls{
+    position:fixed;top:18px;right:18px;
+    display:flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,0.6);
+    backdrop-filter:blur(10px);
+    border-radius:50px;
+    padding:8px 14px;
+    z-index:900;
+    box-shadow:var(--shadow);
+  }
+  .sound-btn{
+    background:none;border:none;cursor:pointer;
+    font-size:18px;color:var(--ink);
+    padding:2px;
+  }
+  .vol-slider{width:70px;accent-color:var(--lavender-deep);cursor:pointer;}
+
+  .reset-btn{
+    position:fixed;bottom:14px;right:14px;
+    font-size:11px;color:rgba(122,111,149,0.4);
+    background:none;border:none;cursor:pointer;
+    z-index:900;
+    padding:6px;
+  }
+  .reset-btn:hover{color:var(--ink-soft);}
+
+  .tw::after{
+    content:'|';
+    animation:blink 1s step-end infinite;
+    color:var(--lavender-deep);
+  }
+  @keyframes blink{50%{opacity:0;}}
+
+  #confettiCanvas{
+    position:fixed;inset:0;
+    pointer-events:none;
+    z-index:1500;
+  }
+
+  .shake{animation:shakeAnim .4s;}
+  @keyframes shakeAnim{
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-8px);}
+    40%{transform:translateX(8px);}
+    60%{transform:translateX(-6px);}
+    80%{transform:translateX(6px);}
+  }
+  .screenshake{animation:screenShake .3s;}
+  @keyframes screenShake{
+    0%,100%{transform:translate(0,0);}
+    25%{transform:translate(2px,-2px);}
+    50%{transform:translate(-2px,2px);}
+    75%{transform:translate(2px,2px);}
+  }
+
+  .final-verdict{
+    text-align:left;
+    font-size:15px;
+    line-height:1.85;
+    margin:18px 0;
+    min-height:40px;
+  }
+  .verdict-check{color:#3aa56a;font-weight:600;}
+  .bug-box{
+    background:linear-gradient(135deg, rgba(255,230,240,0.7), rgba(230,220,255,0.7));
+    border-radius:16px;
+    padding:18px;
+    margin:18px 0;
+    text-align:center;
+    opacity:0;
+    transition:opacity .4s ease;
+  }
+  .bug-box.show{opacity:1;}
+  .bug-from{color:#c45c6c;text-decoration:line-through;font-weight:700;font-size:18px;}
+  .bug-to{
+    color:#3aa56a;font-weight:800;font-size:20px;
+    display:inline-block;
+  }
+  .footer-note{margin-top:24px;font-size:13px;color:var(--ink-soft);}
+
+  /* persistent bottom case footer */
+  .case-footer{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    text-align:center;
+    font-size:11px;
+    letter-spacing:0.5px;
+    color:rgba(122,111,149,0.55);
+    padding:8px 0;
+    z-index:850;
+    background:linear-gradient(to top, rgba(255,255,255,0.35), transparent);
+    pointer-events:none;
+  }
+
+  .hidden-context-msg{
+    position:fixed;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%) scale(0.9);
+    background:rgba(255,255,255,0.95);
+    padding:16px 24px;
+    border-radius:16px;
+    box-shadow:var(--shadow-lg);
+    font-weight:600;
+    z-index:2000;
+    opacity:0;
+    transition:all .3s var(--ease);
+    pointer-events:none;
+    text-align:center;
+    max-width:320px;
+  }
+  .hidden-context-msg.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+
+  /* ===== CINEMATIC INTRO ===== */
+  .cinema-overlay{
+    position:fixed;inset:0;
+    background:#1a1330;
+    z-index:3000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .cinema-overlay.fading{animation:cinemaFadeOut 1s var(--ease) forwards;}
+  @keyframes cinemaFadeOut{to{opacity:0;visibility:hidden;}}
+  .cinema-vignette{
+    position:absolute;inset:0;
+    background:radial-gradient(circle at 50% 50%, transparent 35%, rgba(0,0,0,0.55) 100%);
+  }
+  .cinema-bars{
+    position:absolute;left:0;right:0;
+    height:14%;
+    background:#000;
+    z-index:2;
+  }
+  .cinema-bars.top{top:0;}
+  .cinema-bars.bottom{bottom:0;}
+  .cinema-text{
+    position:relative;z-index:3;
+    color:#f0e6ff;
+    text-align:center;
+    font-weight:300;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    font-size:14px;
+    opacity:0;
+  }
+  .cinema-text.big{
+    font-size:28px;
+    font-weight:700;
+    letter-spacing:2px;
+    margin-top:10px;
+  }
+  .cinema-step{
+    position:absolute;
+    opacity:0;
+    transform:scale(0.92);
+  }
+  .cinema-step.active{
+    animation:cinemaStepIn 1.6s var(--ease) forwards;
+  }
+  @keyframes cinemaStepIn{
+    0%{opacity:0;transform:scale(0.9) translateY(10px);}
+    15%{opacity:1;transform:scale(1) translateY(0);}
+    85%{opacity:1;}
+    100%{opacity:0;transform:scale(1.04) translateY(-6px);}
+  }
+  .cinema-lens{
+    position:absolute;
+    width:220px;height:220px;
+    border:2px solid rgba(220,190,255,0.5);
+    border-radius:50%;
+    z-index:2;
+    box-shadow:0 0 80px rgba(180,140,230,0.4) inset;
+    animation:lensPulse 3s ease-in-out infinite;
+  }
+  @keyframes lensPulse{0%,100%{transform:scale(1);opacity:0.5;}50%{transform:scale(1.05);opacity:0.8;}}
+
+  /* ===== EVIDENCE FOLDER ===== */
+  .folder-scene{
+    position:relative;
+    width:100%;
+    height:280px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .folder-body{
+    position:relative;
+    width:180px;height:130px;
+  }
+  .folder-back{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(135deg,#e0c9ff,#ffd3e8);
+    border-radius:8px 8px 4px 4px;
+    box-shadow:0 10px 30px rgba(150,120,200,0.4);
+  }
+  .folder-tab{
+    position:absolute;
+    top:-14px;left:14px;
+    width:60px;height:18px;
+    background:linear-gradient(135deg,#e0c9ff,#ffd3e8);
+    border-radius:6px 6px 0 0;
+  }
+  .paper{
+    position:absolute;
+    width:140px;height:170px;
+    left:20px;top:-20px;
+    background:#fffaf5;
+    border-radius:4px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.15);
+    transform-origin:bottom center;
+    opacity:0;
+    padding:14px 12px;
+    font-size:9px;
+    text-align:left;
+    color:#9088a0;
+    line-height:1.6;
+    overflow:hidden;
+  }
+  .paper .pline{
+    height:4px;
+    background:rgba(150,130,180,0.25);
+    border-radius:2px;
+    margin-bottom:7px;
+  }
+  .paper.slide-out-1{animation:paperOut1 1s var(--ease) forwards;animation-delay:.2s;}
+  .paper.slide-out-2{animation:paperOut2 1s var(--ease) forwards;animation-delay:.45s;}
+  .paper.slide-out-3{animation:paperOut3 1s var(--ease) forwards;animation-delay:.7s;}
+  @keyframes paperOut1{
+    0%{opacity:0;transform:translateY(0) rotate(0deg) scale(0.9);}
+    100%{opacity:1;transform:translate(-70px,-90px) rotate(-14deg) scale(1);}
+  }
+  @keyframes paperOut2{
+    0%{opacity:0;transform:translateY(0) rotate(0deg) scale(0.9);}
+    100%{opacity:1;transform:translate(10px,-110px) rotate(3deg) scale(1);}
+  }
+  @keyframes paperOut3{
+    0%{opacity:0;transform:translateY(0) rotate(0deg) scale(0.9);}
+    100%{opacity:1;transform:translate(75px,-85px) rotate(13deg) scale(1);}
+  }
+  .folder-lid{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(135deg,#d3b3f5,#ffc2dd);
+    border-radius:8px 8px 4px 4px;
+    transform-origin:bottom center;
+    box-shadow:0 8px 20px rgba(150,120,200,0.3);
+    z-index:5;
+    animation:lidOpen 1s var(--ease) forwards;
+    animation-delay:0s;
+  }
+  @keyframes lidOpen{
+    0%{transform:rotateX(0deg);}
+    100%{transform:rotateX(-110deg);}
+  }
+
+  /* ===== CONFIDENTIAL STAMP ===== */
+  .stamp{
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%) rotate(-12deg) scale(3);
+    border:5px solid #d23c5e;
+    color:#d23c5e;
+    font-family:'Courier Prime', monospace;
+    font-weight:900;
+    font-size:26px;
+    letter-spacing:3px;
+    padding:8px 20px;
+    border-radius:8px;
+    opacity:0;
+    z-index:50;
+    pointer-events:none;
+    mix-blend-mode:multiply;
+  }
+  .stamp.slam{
+    animation:stampSlam .4s cubic-bezier(.36,1.8,.4,1) forwards;
+  }
+  @keyframes stampSlam{
+    0%{opacity:0;transform:translate(-50%,-50%) rotate(-12deg) scale(3);}
+    60%{opacity:0.9;transform:translate(-50%,-50%) rotate(-12deg) scale(0.92);}
+    75%{opacity:0.9;transform:translate(-50%,-50%) rotate(-12deg) scale(1.05);}
+    100%{opacity:0.85;transform:translate(-50%,-50%) rotate(-12deg) scale(1);}
+  }
+
+  /* ===== PRINTING ANIMATION ===== */
+  .printer-scene{
+    position:relative;
+    width:100%;
+    height:160px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+  }
+  .printer-body{
+    width:140px;height:50px;
+    background:linear-gradient(135deg,#cdb4f0,#f0b8d8);
+    border-radius:8px;
+    box-shadow:0 8px 20px rgba(150,120,200,0.4);
+    position:relative;
+    z-index:2;
+  }
+  .printer-slot{
+    position:absolute;
+    top:-2px;left:10px;right:10px;
+    height:6px;
+    background:#3a2f50;
+    border-radius:3px;
+  }
+  .printer-page{
+    position:absolute;
+    width:110px;height:0px;
+    background:#fff;
+    left:25px;
+    top:-2px;
+    border-radius:2px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.15);
+    overflow:hidden;
+    z-index:1;
+    animation:pagePrint 2.2s linear forwards;
+  }
+  @keyframes pagePrint{
+    0%{height:0px;top:-2px;}
+    100%{height:140px;top:-130px;}
+  }
+  .printer-page .pgline{
+    height:3px;margin:8px 10px;
+    background:rgba(150,130,180,0.3);
+    border-radius:2px;
+  }
+
+  /* ===== WINDOWS-STYLE NOTIFICATION ===== */
+  .win-toast{
+    position:fixed;
+    bottom:60px;right:18px;
+    width:300px;
+    background:rgba(255,255,255,0.97);
+    border-radius:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    padding:14px 16px;
+    z-index:1900;
+    border-left:4px solid #6a4fc7;
+    transform:translateX(360px);
+    transition:transform .5s var(--ease);
+    font-size:13px;
+  }
+  .win-toast.show{transform:translateX(0);}
+  .win-toast-title{font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+  .win-toast-body{color:var(--ink-soft);}
+
+  /* suspense blink */
+  .suspense-cursor{
+    display:inline-block;
+    width:3px;height:22px;
+    background:var(--lavender-deep);
+    margin-left:4px;
+    vertical-align:middle;
+    animation:blink .6s step-end infinite;
+  }
+
+  /* final whisper message */
+  .whisper{
+    text-align:center;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:18px;
+    opacity:0;
+    transition:opacity 1s ease;
+  }
+  .whisper.show{opacity:1;}
+
+  @media (max-width:480px){
+    .card{padding:30px 22px;}
+    h1{font-size:22px;}
+    .q-text{font-size:18px;}
+    .chase-area{height:280px;}
+    .win-toast{width:240px;right:10px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="blob-field" id="blobField">
+  <div class="blob blob1" data-depth="0.02"></div>
+  <div class="blob blob2" data-depth="0.035"></div>
+  <div class="blob blob3" data-depth="0.05"></div>
+  <div class="blob blob4" data-depth="0.025"></div>
+</div>
+
+<canvas id="confettiCanvas"></canvas>
+
+<!-- CINEMATIC INTRO OVERLAY -->
+<div class="cinema-overlay" id="cinemaOverlay">
+  <div class="cinema-bars top"></div>
+  <div class="cinema-bars bottom"></div>
+  <div class="cinema-vignette"></div>
+  <div class="cinema-lens" id="cinemaLens"></div>
+  <div class="cinema-step active" id="cinemaStep">
+    <div class="cinema-text">Personality Investigation Bureau</div>
+  </div>
+</div>
+
+<div class="sound-controls">
+  <button class="sound-btn" id="muteBtn" title="Mute/Unmute">🔊</button>
+  <input type="range" class="vol-slider" id="volSlider" min="0" max="100" value="12">
+</div>
+
+<button class="reset-btn" id="resetBtn" title="Reset Investigation">↺ reset</button>
+
+<div class="tilt-wrap" id="tiltWrap">
+<div class="app" id="app">
+
+  <!-- INTRO SCREEN -->
+  <div class="screen active" id="screen-intro">
+    <div class="card">
+      <span class="magnify">🔍</span>
+      <div class="badge">Personality Investigation Bureau</div>
+      <h1>Case #0001</h1>
+      <div class="case-row"><span class="label">Suspect</span><span class="value" id="suspectNameDisplay">—</span></div>
+      <div class="case-row"><span class="label">Charge</span><span class="value">Possible Instagram Bio Mismatch</span></div>
+      <div class="case-row"><span class="label">Status</span><span class="value status-pending">Investigation Pending</span></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="beginBtn">Begin Investigation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVIDENCE FOLDER SCREEN -->
+  <div class="screen" id="screen-folder">
+    <div class="card">
+      <h1>Opening Evidence Folder</h1>
+      <div class="folder-scene" id="folderScene">
+        <div class="folder-body">
+          <div class="paper" id="paper1">
+            <div class="pline" style="width:70%"></div>
+            <div class="pline" style="width:90%"></div>
+            <div class="pline" style="width:60%"></div>
+            <div class="pline" style="width:80%"></div>
+          </div>
+          <div class="paper" id="paper2">
+            <div class="pline" style="width:85%"></div>
+            <div class="pline" style="width:55%"></div>
+            <div class="pline" style="width:75%"></div>
+          </div>
+          <div class="paper" id="paper3">
+            <div class="pline" style="width:65%"></div>
+            <div class="pline" style="width:95%"></div>
+            <div class="pline" style="width:50%"></div>
+            <div class="pline" style="width:70%"></div>
+          </div>
+          <div class="folder-back"></div>
+          <div class="folder-tab"></div>
+          <div class="folder-lid"></div>
+        </div>
+        <div class="stamp" id="confidentialStamp">CONFIDENTIAL</div>
+      </div>
+      <div class="loading-msg" id="folderMsg">Unsealing case file...</div>
+    </div>
+  </div>
+
+  <!-- LOADING SCREEN -->
+  <div class="screen" id="screen-loading">
+    <div class="card">
+      <span class="magnify">🛰️</span>
+      <h1>Initializing Investigation</h1>
+      <div class="loading-msg tw" id="loadingMsg">Connecting to Investigation Server...</div>
+      <div class="progress-track"><div class="progress-fill" id="loadingFill"></div></div>
+      <div class="progress-pct" id="loadingPct">0%</div>
+    </div>
+  </div>
+
+  <!-- QUESTION SCREEN -->
+  <div class="screen" id="screen-question">
+    <div class="card" id="questionCard">
+      <div class="q-meta">
+        <span class="q-number" id="qNumber">Question 1 / 12</span>
+        <div class="mini-track"><div class="mini-fill" id="qProgressFill"></div></div>
+      </div>
+      <span class="q-icon" id="qIcon">🕵️</span>
+      <div class="q-text" id="qText">Loading question...</div>
+      <div id="qExtra"></div>
+      <div class="btn-row" id="qButtons"></div>
+    </div>
+  </div>
+
+  <!-- FAKE SCAN -->
+  <div class="screen" id="screen-scan">
+    <div class="card">
+      <span class="magnify">📡</span>
+      <h1>Scanning</h1>
+      <div class="loading-msg tw" id="scanMsg">Analyzing Instagram...</div>
+      <div class="progress-track"><div class="progress-fill" id="scanFill"></div></div>
+    </div>
+  </div>
+
+  <!-- FINAL CHASE SCREEN -->
+  <div class="screen" id="screen-final-question">
+    <div class="card" id="chaseCard">
+      <div class="q-meta">
+        <span class="q-number">Question 12 / 12 — Final</span>
+        <div class="mini-track"><div class="mini-fill" style="width:100%"></div></div>
+      </div>
+      <span class="q-icon">🧩</span>
+      <div class="q-text">Which personality are you?</div>
+      <div class="chase-area" id="chaseArea">
+        <button class="chase-btn" id="infjBtn">INFJ</button>
+        <button class="chase-btn" id="infpBtn">INFP</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRINTING SCREEN -->
+  <div class="screen" id="screen-printing">
+    <div class="card">
+      <h1>Finalizing Report</h1>
+      <div class="printer-scene">
+        <div class="printer-body">
+          <div class="printer-slot"></div>
+          <div class="printer-page" id="printerPage">
+            <div class="pgline" style="width:80%"></div>
+            <div class="pgline" style="width:60%"></div>
+            <div class="pgline" style="width:90%"></div>
+            <div class="pgline" style="width:70%"></div>
+            <div class="pgline" style="width:55%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="loading-msg" id="printingMsg">Printing Report...</div>
+    </div>
+  </div>
+
+  <!-- VICTORY SCREEN -->
+  <div class="screen" id="screen-victory">
+    <div class="card">
+      <span class="magnify">📋</span>
+      <h1 id="victoryTitle">Investigation Complete</h1>
+      <div class="loading-msg" id="victorySub"></div>
+      <div class="final-verdict" id="finalVerdict" style="display:none;"></div>
+      <div class="whisper" id="whisperMsg">Now... go fix that bio. 😉</div>
+      <div class="footer-note">Made with unnecessary dedication by one of your students. 💜</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="achievement" id="achievementToast"><span class="ico">🏆</span><span id="achievementText">Achievement</span></div>
+<div class="hidden-context-msg" id="contextMsg">Looking for Developer Tools?</div>
+<div class="win-toast" id="winToast">
+  <div class="win-toast-title">🔔 Personality Investigation Bureau</div>
+  <div class="win-toast-body">Instagram Bio Bug Detected.</div>
+</div>
+
+<div class="case-footer">Personality Investigation Bureau • Internal Use Only</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ===================== CONFIG ===================== */
+const CONFIG = {
+  suspectName: "Asfiya",
+  reporterName: "Arhan",
+  legalAdvocateName: "Ajeet Sir",
+  currentBio: "INFJ",
+  recommendedBio: "INFP"
+};
+document.getElementById('suspectNameDisplay').textContent = CONFIG.suspectName;
+
+/* ===================== STATE ===================== */
+const STORAGE_KEY = 'pib_state_v2';
+let state = {
+  started:false,
+  completed:false,
+  currentQuestion:1,
+  infjClicks:0,
+  achievements:{},
+  muted:false,
+  volume:12,
+  welcomeShown:false,
+  introSeen:false
+};
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      state = Object.assign(state, parsed);
+    }
+  }catch(e){}
+}
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  catch(e){}
+}
+loadState();
+
+/* ===================== AUDIO ===================== */
+let audioCtx = null;
+function ensureCtx(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function playTone(freq, dur, type='sine', vol=0.18, delay=0){
+  if(state.muted) return;
+  try{
+    const ctx = ensureCtx();
+    const t0 = ctx.currentTime + delay;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t0);
+    gain.gain.setValueAtTime(0, t0);
+    gain.gain.linearRampToValueAtTime(vol*(state.volume/100), t0+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0+dur+0.05);
+  }catch(e){}
+}
+function playSweep(f0,f1,dur,type='sine',vol=0.15,delay=0){
+  if(state.muted) return;
+  try{
+    const ctx = ensureCtx();
+    const t0 = ctx.currentTime + delay;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(f0,t0);
+    osc.frequency.exponentialRampToValueAtTime(f1, t0+dur);
+    gain.gain.setValueAtTime(0,t0);
+    gain.gain.linearRampToValueAtTime(vol*(state.volume/100), t0+0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0+dur+0.05);
+  }catch(e){}
+}
+
+const SFX = {
+  open: ()=>{ playTone(523,0.15,'sine',0.15); playTone(659,0.2,'sine',0.15,0.12); playTone(784,0.25,'sine',0.12,0.24); },
+  boot: ()=>{ for(let i=0;i<4;i++) playTone(300+i*80,0.08,'square',0.08,i*0.07); },
+  beep: ()=> playTone(880,0.06,'square',0.07),
+  ding: ()=>{ playTone(784,0.12,'sine',0.18); playTone(988,0.18,'sine',0.16,0.08); },
+  bonk: ()=> playTone(140,0.18,'sawtooth',0.18),
+  pop: ()=> playTone(660,0.07,'sine',0.14),
+  whoosh: ()=> playSweep(500,120,0.3,'sine',0.12),
+  whooshUp: ()=> playSweep(200,800,0.25,'sine',0.1),
+  tick: ()=> playTone(1200,0.03,'square',0.05),
+  type: ()=> playTone(1500+Math.random()*300,0.02,'square',0.03),
+  drumroll: ()=>{ for(let i=0;i<14;i++) playTone(150,0.05,'sawtooth',0.05,i*0.07); },
+  celebrate: ()=>{ [523,659,784,1046,1318].forEach((f,i)=>playTone(f,0.3,'sine',0.17,i*0.09)); },
+  stamp: ()=>{ playTone(90,0.12,'square',0.25); playTone(60,0.18,'sawtooth',0.18,0.04); },
+  pageSlide: ()=> playSweep(300,900,0.4,'triangle',0.08),
+  printer: ()=>{ for(let i=0;i<6;i++) playTone(700+Math.random()*100,0.04,'square',0.04,i*0.15); },
+  notif: ()=>{ playTone(660,0.1,'sine',0.15); playTone(880,0.14,'sine',0.13,0.1); },
+  shutter: ()=>{ playTone(200,0.04,'square',0.2); playTone(150,0.06,'square',0.15,0.04); }
+};
+
+let musicInterval = null;
+function startMusic(){
+  if(musicInterval) return;
+  const notes = [392,440,494,392,349,392,440,494];
+  let idx = 0;
+  musicInterval = setInterval(()=>{
+    if(!state.muted) playTone(notes[idx % notes.length], 1.1, 'sine', 0.045);
+    idx++;
+  }, 1400);
+}
+
+const muteBtn = document.getElementById('muteBtn');
+const volSlider = document.getElementById('volSlider');
+volSlider.value = state.volume;
+function refreshMuteUI(){ muteBtn.textContent = state.muted ? '🔇' : '🔊'; }
+refreshMuteUI();
+muteBtn.addEventListener('click', ()=>{
+  state.muted = !state.muted;
+  refreshMuteUI();
+  saveState();
+});
+volSlider.addEventListener('input', ()=>{
+  state.volume = parseInt(volSlider.value,10);
+  saveState();
+});
+
+/* ===================== AMBIENT PARTICLES ===================== */
+function spawnParticles(){
+  const colors = ['rgba(255,255,255,0.8)','rgba(220,190,255,0.7)','rgba(255,200,225,0.7)'];
+  setInterval(()=>{
+    const p = document.createElement('div');
+    p.className='particle';
+    const size = 3+Math.random()*5;
+    p.style.width = size+'px';
+    p.style.height = size+'px';
+    p.style.left = Math.random()*100+'vw';
+    p.style.bottom = '-10px';
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDuration = (10+Math.random()*10)+'s';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(), 22000);
+  }, 900);
+}
+spawnParticles();
+
+/* ===================== MOUSE SPARKLES ===================== */
+let lastSparkle = 0;
+document.addEventListener('mousemove', (e)=>{
+  const now = Date.now();
+  if(now - lastSparkle < 60) return;
+  lastSparkle = now;
+  const s = document.createElement('div');
+  s.className='sparkle';
+  const size = 4+Math.random()*5;
+  s.style.width = size+'px';
+  s.style.height = size+'px';
+  s.style.left = (e.clientX - size/2)+'px';
+  s.style.top = (e.clientY - size/2)+'px';
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(), 700);
+});
+
+/* ===================== PARALLAX BLOBS + PAGE TILT ===================== */
+const blobs = document.querySelectorAll('.blob');
+const tiltWrap = document.getElementById('tiltWrap');
+let mouseX = 0.5, mouseY = 0.5;
+document.addEventListener('mousemove', (e)=>{
+  mouseX = e.clientX / window.innerWidth;
+  mouseY = e.clientY / window.innerHeight;
+  const dx = (mouseX - 0.5);
+  const dy = (mouseY - 0.5);
+
+  blobs.forEach(b=>{
+    const depth = parseFloat(b.dataset.depth) || 0.03;
+    const moveX = dx * window.innerWidth * depth;
+    const moveY = dy * window.innerHeight * depth;
+    b.style.transform = `translate(${moveX}px, ${moveY}px)`;
+  });
+
+  const tiltX = dy * -6;
+  const tiltY = dx * 6;
+  tiltWrap.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+});
+
+/* ===================== SCREEN MANAGEMENT ===================== */
+const screens = {
+  intro: document.getElementById('screen-intro'),
+  folder: document.getElementById('screen-folder'),
+  loading: document.getElementById('screen-loading'),
+  question: document.getElementById('screen-question'),
+  scan: document.getElementById('screen-scan'),
+  finalQuestion: document.getElementById('screen-final-question'),
+  printing: document.getElementById('screen-printing'),
+  victory: document.getElementById('screen-victory')
+};
+function showScreen(name){
+  Object.values(screens).forEach(s=>s.classList.remove('active'));
+  screens[name].classList.add('active');
+}
+
+/* ===================== VARIED TOAST SYSTEM ===================== */
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+const TOAST_STYLES = ['t-drop','t-pop','t-slide','t-shake','t-flip'];
+let lastStyle = -1;
+function showToast(msg, sfx){
+  clearTimeout(toastTimer);
+  toastEl.classList.remove('show','hide',...TOAST_STYLES);
+  toastEl.textContent = msg;
+  let styleIdx = Math.floor(Math.random()*TOAST_STYLES.length);
+  if(styleIdx === lastStyle) styleIdx = (styleIdx+1)%TOAST_STYLES.length;
+  lastStyle = styleIdx;
+  const style = TOAST_STYLES[styleIdx];
+  void toastEl.offsetWidth;
+  toastEl.classList.add('show', style);
+  if(sfx) sfx();
+  toastTimer = setTimeout(()=>{
+    toastEl.classList.add('hide');
+    toastEl.classList.remove('show');
+  }, 2300);
+}
+
+const achEl = document.getElementById('achievementToast');
+const achTextEl = document.getElementById('achievementText');
+let achTimer = null;
+function unlockAchievement(id, icon, text){
+  if(state.achievements[id]) return;
+  state.achievements[id] = true;
+  saveState();
+  clearTimeout(achTimer);
+  achTextEl.innerHTML = `<span class="ico">${icon}</span> <strong>${text}</strong>`;
+  achEl.classList.add('show');
+  SFX.ding();
+  achTimer = setTimeout(()=>achEl.classList.remove('show'), 3000);
+}
+
+/* ===================== WRONG ANSWER POPUPS ===================== */
+const WRONG_GENERIC = [
+  "Interesting... unfortunately the evidence disagrees.",
+  "Our records politely disagree.",
+  "The detective isn't convinced.",
+  "That answer looks suspicious.",
+  "The witnesses disagree.",
+  "The evidence has trust issues.",
+  "Please reconsider.",
+  "Nice attempt.",
+  "That explanation has been rejected.",
+  "Evidence says otherwise.",
+  "Your answer has been placed under investigation.",
+  "The committee has concerns.",
+  "Let's pretend that never happened.",
+  "Not quite.",
+  "Wrong answer. Try again.",
+  "The detective is unconvinced.",
+  "That's not how this investigation remembers it.",
+  "Please try again.",
+  "This investigation was literally created for you, Asfiya.",
+  "Hmm... that's an interesting version of history.",
+  "The file says otherwise.",
+  "An objection has been noted.",
+  "The jury is not amused.",
+  "That statement has been flagged.",
+  "Suspicious. Try again.",
+  "The magnifying glass disagrees.",
+  "Evidence Bureau says: nope.",
+  "That answer just failed a polygraph.",
+  "The case file begs to differ.",
+  "Try again, detective's orders."
+];
+function randomWrong(){ return WRONG_GENERIC[Math.floor(Math.random()*WRONG_GENERIC.length)]; }
+
+const LOADING_MESSAGES = [
+  "Connecting to Investigation Server...",
+  "Searching Instagram...",
+  "Collecting Evidence...",
+  "Consulting AI...",
+  "Interviewing Witnesses...",
+  "Checking Personality Database...",
+  "Running Psychological Scan...",
+  "Contacting Detective Department...",
+  "Analyzing Personality Results...",
+  "Reading Previous Records...",
+  "Comparing Test History...",
+  "Checking Instagram Archive...",
+  "Calibrating Sarcasm Engine...",
+  "Contacting Common Sense...",
+  "Verifying Evidence...",
+  "Cross Checking Answers...",
+  "Looking for Contradictions...",
+  "Generating Investigation Report...",
+  "Loading Detective Ducks...",
+  "Polishing Magnifying Glass...",
+  "Almost Ready..."
+];
+
+const ENCOURAGEMENT = [
+  "Need help deciding? 🤭",
+  "Take your time, detective is patient...ish.",
+  "The evidence isn't going anywhere.",
+  "Still thinking? The case can wait.",
+  "No rush. Probably.",
+  "The detective is tapping their foot.",
+  "Tick tock, just kidding, take your time.",
+  "Evidence doesn't expire. Mostly.",
+  "Breathe. Then click.",
+  "We believe in you, Asfiya."
+];
+
+function typewrite(el, text, speed, cb){
+  el.textContent = '';
+  el.classList.add('tw');
+  let i = 0;
+  const timer = setInterval(()=>{
+    el.textContent += text[i];
+    const c = text[i];
+    if(c && c!==' ' && Math.random()<0.6) SFX.type();
+    i++;
+    if(i>=text.length){
+      clearInterval(timer);
+      el.classList.remove('tw');
+      if(cb) cb();
+    }
+  }, speed);
+}
+
+/* ===================== CINEMATIC INTRO SEQUENCE ===================== */
+const cinemaOverlay = document.getElementById('cinemaOverlay');
+const cinemaStep = document.getElementById('cinemaStep');
+const cinemaLens = document.getElementById('cinemaLens');
+
+const CINEMA_SEQUENCE = [
+  { html:'<div class="cinema-text">Case File #0001</div>', dur:1700 },
+  { html:'<div class="cinema-text">Suspect:</div><div class="cinema-text big">'+CONFIG.suspectName+'</div>', dur:1900 },
+  { html:'<div class="cinema-text">Charge:</div><div class="cinema-text big" style="font-size:20px;">Possible Instagram Bio Mismatch</div>', dur:1900 },
+  { html:'<div class="cinema-text big" style="font-size:22px;">Investigation Begins Now</div>', dur:1600 }
+];
+
+function runCinematicIntro(cb){
+  if(state.introSeen){
+    cinemaOverlay.style.display='none';
+    cb();
+    return;
+  }
+  ensureCtx();
+  SFX.shutter();
+  let i = 0;
+  function step(){
+    if(i >= CINEMA_SEQUENCE.length){
+      cinemaOverlay.classList.add('fading');
+      setTimeout(()=>{
+        cinemaOverlay.style.display='none';
+        state.introSeen = true;
+        saveState();
+        cb();
+      }, 900);
+      return;
+    }
+    cinemaStep.classList.remove('active');
+    void cinemaStep.offsetWidth;
+    cinemaStep.innerHTML = CINEMA_SEQUENCE[i].html;
+    cinemaStep.classList.add('active');
+    SFX.beep();
+    cinemaLens.style.transform = `scale(${1+i*0.06})`;
+    setTimeout(()=>{ i++; step(); }, CINEMA_SEQUENCE[i].dur);
+  }
+  step();
+}
+
+// auto-skip cinema if already seen on initial load (handled in restoreProgress)
+
+/* ===================== BEGIN INVESTIGATION ===================== */
+document.getElementById('beginBtn').addEventListener('click', function(e){
+  rippleEffect(e, this);
+  ensureCtx();
+  SFX.boot();
+  startMusic();
+  state.started = true;
+  saveState();
+  runFolderScene();
+});
+
+function rippleEffect(e, btn){
+  const r = document.createElement('span');
+  r.className = 'ripple';
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  r.style.width = r.style.height = size+'px';
+  r.style.left = (e.clientX - rect.left - size/2)+'px';
+  r.style.top = (e.clientY - rect.top - size/2)+'px';
+  btn.appendChild(r);
+  setTimeout(()=>r.remove(), 650);
+}
+
+/* ===================== EVIDENCE FOLDER SCENE ===================== */
+function runFolderScene(){
+  showScreen('folder');
+  const msgEl = document.getElementById('folderMsg');
+  const stamp = document.getElementById('confidentialStamp');
+  const p1 = document.getElementById('paper1');
+  const p2 = document.getElementById('paper2');
+  const p3 = document.getElementById('paper3');
+
+  msgEl.textContent = 'Unsealing case file...';
+  SFX.pageSlide();
+
+  setTimeout(()=>{
+    p1.classList.add('slide-out-1');
+    p2.classList.add('slide-out-2');
+    p3.classList.add('slide-out-3');
+    SFX.whooshUp();
+  }, 200);
+
+  setTimeout(()=>{
+    msgEl.textContent = 'Evidence retrieved.';
+    stamp.classList.add('slam');
+    SFX.stamp();
+  }, 1500);
+
+  setTimeout(()=>{
+    runLoading();
+  }, 2600);
+}
+
+/* ===================== LOADING SEQUENCE ===================== */
+function runLoading(){
+  showScreen('loading');
+  const fill = document.getElementById('loadingFill');
+  const pct = document.getElementById('loadingPct');
+  const msgEl = document.getElementById('loadingMsg');
+  let progress = 0;
+  let msgIdx = 0;
+  fill.style.width = '0%';
+
+  function nextMsg(){
+    msgEl.textContent = LOADING_MESSAGES[msgIdx % LOADING_MESSAGES.length];
+    msgIdx++;
+  }
+  nextMsg();
+  const msgTimer = setInterval(()=>{ nextMsg(); }, 650);
+
+  const progTimer = setInterval(()=>{
+    progress += 4 + Math.random()*8;
+    if(progress>100) progress=100;
+    fill.style.width = progress+'%';
+    pct.textContent = Math.floor(progress)+'%';
+    SFX.tick();
+    if(progress>=100){
+      clearInterval(progTimer);
+      clearInterval(msgTimer);
+      setTimeout(()=>{ goToQuestion(state.currentQuestion); }, 400);
+    }
+  }, 220);
+}
+
+/* ===================== QUESTIONS DATA ===================== */
+const QUESTIONS = [
+  null,
+  { icon:'🕵️', text:`Are you ${CONFIG.suspectName}?`,
+    wrong:`This investigation was literally created only for ${CONFIG.suspectName}. Please stop confusing the detective.` },
+  { icon:'🤝', text:'Are you answering honestly today?',
+    wrong:'Appreciate the honesty. Unfortunately honest answers are required.' },
+  { icon:'📝', text:'Have you taken a personality test before?',
+    wrong:'Our records politely disagree.' },
+  { icon:'📱', text:`Have you ever written ${CONFIG.currentBio} in your Instagram bio?`,
+    wrong:'Screenshot evidence says otherwise.' },
+  { icon:'🧠', text:`Did your latest personality test say ${CONFIG.recommendedBio}?`,
+    wrong:"Hmm... that's an interesting version of history." },
+  { icon:'👥', text:'Should we trust the available evidence?',
+    wrong:'The witnesses seem disappointed.', extra:'witness' },
+  { icon:'⚖️', text:'Continue Investigation', isNotice:true,
+    extra:'legal' },
+  { icon:'📸', text:'Is your Instagram bio always correct?',
+    wrong:'Our investigation team respectfully disagrees.' },
+  { icon:'🤖', text:'Proceeding with AI Analysis...', isNotice:true,
+    extra:'ai' },
+  { icon:'📊', text:'Does all available evidence point toward one conclusion?',
+    wrong:'The evidence would like another word with you.', extra:'evidence' },
+  { icon:'🗂️', text:'Should this investigation be closed?',
+    wrong:'The detective still has unfinished paperwork.' }
+];
+const TOTAL_QUESTIONS = 11;
+
+/* ===================== RENDER QUESTION ===================== */
+const qNumberEl = document.getElementById('qNumber');
+const qProgressFill = document.getElementById('qProgressFill');
+const qIconEl = document.getElementById('qIcon');
+const qTextEl = document.getElementById('qText');
+const qExtraEl = document.getElementById('qExtra');
+const qButtonsEl = document.getElementById('qButtons');
+
+function goToQuestion(n){
+  state.currentQuestion = n;
+  saveState();
+  if(n > TOTAL_QUESTIONS){
+    showFinalChase();
+    return;
+  }
+  const q = QUESTIONS[n];
+  showScreen('question');
+  qNumberEl.textContent = `Question ${n} / 12`;
+  qProgressFill.style.width = (n/12*100)+'%';
+  qIconEl.textContent = q.icon;
+  qExtraEl.innerHTML = '';
+  qButtonsEl.innerHTML = '';
+
+  if(q.extra === 'witness'){
+    qTextEl.textContent = q.text;
+    qExtraEl.innerHTML = `
+      <div class="panel-box">
+        <div class="witness-item"><span class="check-icon check-done">✔</span> Student</div>
+        <div class="witness-item"><span class="check-icon check-done">✔</span> Personality Test</div>
+        <div class="witness-item"><span class="check-icon check-done">✔</span> Instagram</div>
+      </div>`;
+    renderYesNo(n, q);
+  } else if(q.extra === 'legal'){
+    qTextEl.textContent = '⚖ Official Legal Notice';
+    qExtraEl.innerHTML = `
+      <div class="legal-box">
+        <div class="legal-title">⚖ Official Legal Warning</div>
+        <p>${CONFIG.legalAdvocateName} has kindly agreed to serve as your legal advocate.</p>
+        <p>However... one more incorrect statement may result in a completely fictional sentence of:</p>
+        <p style="text-align:center;font-size:18px;">🪑 Seven Minutes in Jail.</p>
+        <p style="font-size:12px;color:var(--ink-soft);">(Our legal department insists this is only a joke.)</p>
+      </div>`;
+    const btn = makeButton('Continue Investigation', true);
+    btn.addEventListener('click', (e)=>{
+      rippleEffect(e, btn);
+      SFX.ding();
+      goToQuestion(n+1);
+    });
+    qButtonsEl.appendChild(btn);
+  } else if(q.extra === 'ai'){
+    qTextEl.textContent = 'AI Analysis in Progress';
+    qExtraEl.innerHTML = `
+      <div class="panel-box" id="aiPanel">
+        <div class="ai-check-item" data-i="0"><span class="check-icon check-pending">○</span> Checking ChatGPT...</div>
+        <div class="ai-check-item" data-i="1"><span class="check-icon check-pending">○</span> Checking Common Sense...</div>
+        <div class="ai-check-item" data-i="2"><span class="check-icon check-pending">○</span> Checking Personality Test...</div>
+        <div class="ai-check-item" data-i="3"><span class="check-icon check-pending">○</span> Checking Instagram...</div>
+        <div class="ai-check-item" data-i="4"><span class="check-icon check-pending">○</span> Checking Evidence...</div>
+      </div>`;
+    qButtonsEl.innerHTML = '';
+    runAiChecks(n);
+  } else if(q.extra === 'evidence'){
+    qTextEl.textContent = q.text;
+    qExtraEl.innerHTML = `
+      <div class="panel-box">
+        <div style="margin-bottom:8px;font-weight:600;">Evidence Strength</div>
+        <div class="progress-track"><div class="progress-fill" id="evidenceFill" style="width:0%"></div></div>
+        <div class="progress-pct" id="evidencePct">0%</div>
+      </div>`;
+    renderYesNo(n, q);
+    setTimeout(()=>{
+      const ef = document.getElementById('evidenceFill');
+      const ep = document.getElementById('evidencePct');
+      let cur=0;
+      const t = setInterval(()=>{
+        cur+=7;
+        if(cur>98){cur=98;clearInterval(t);}
+        if(ef) ef.style.width=cur+'%';
+        if(ep) ep.textContent = cur+'%';
+        SFX.tick();
+      }, 60);
+    }, 200);
+  } else {
+    qTextEl.textContent = q.text;
+    renderYesNo(n, q);
+  }
+}
+
+function makeButton(label, primary){
+  const btn = document.createElement('button');
+  btn.className = 'btn ' + (primary ? 'btn-primary' : 'btn-choice');
+  btn.textContent = label;
+  return btn;
+}
+
+function renderYesNo(n, q){
+  const yesBtn = makeButton('YES', false);
+  const noBtn = makeButton('NO', false);
+  yesBtn.addEventListener('click', (e)=>{ rippleEffect(e, yesBtn); handleAnswer(n, true, q); });
+  noBtn.addEventListener('click', (e)=>{ rippleEffect(e, noBtn); handleAnswer(n, false, q); });
+  qButtonsEl.appendChild(yesBtn);
+  qButtonsEl.appendChild(noBtn);
+}
+
+function handleAnswer(n, isYes, q){
+  if(isYes){
+    SFX.ding();
+    if(n===1) unlockAchievement('start','🕵️','Investigation Started');
+    if(n===4) unlockAchievement('instagram','📸','Instagram Investigator');
+    if(n===4){
+      runScanTransition(()=>goToQuestion(n+1));
+      return;
+    }
+    goToQuestion(n+1);
+  } else {
+    SFX.bonk();
+    if(!state.achievements['firstWrong']) unlockAchievement('firstWrong','🤷','First Wrong Answer');
+    document.getElementById('questionCard').classList.add('shake');
+    setTimeout(()=>document.getElementById('questionCard').classList.remove('shake'), 400);
+    showToast(q.wrong || randomWrong());
+  }
+}
+
+/* ===================== SCAN TRANSITION ===================== */
+function runScanTransition(cb){
+  showScreen('scan');
+  const msgEl = document.getElementById('scanMsg');
+  const fill = document.getElementById('scanFill');
+  const seq = ['Analyzing Instagram...','Comparing Personality Results...','Conflict Detected.'];
+  let i=0;
+  fill.style.width='0%';
+  msgEl.textContent = seq[0];
+  const msgTimer = setInterval(()=>{
+    i++;
+    if(i<seq.length) msgEl.textContent = seq[i];
+  }, 600);
+  let p=0;
+  const pTimer = setInterval(()=>{
+    p+=12;
+    if(p>100)p=100;
+    fill.style.width=p+'%';
+    SFX.beep();
+    if(p>=100){
+      clearInterval(pTimer);
+      clearInterval(msgTimer);
+      setTimeout(cb, 500);
+    }
+  }, 180);
+}
+
+/* ===================== AI CHECKS ===================== */
+function runAiChecks(n){
+  const items = document.querySelectorAll('#aiPanel .ai-check-item');
+  let i=0;
+  const timer = setInterval(()=>{
+    if(i < items.length){
+      const icon = items[i].querySelector('.check-icon');
+      icon.textContent = '✔';
+      icon.classList.remove('check-pending');
+      icon.classList.add('check-done');
+      SFX.pop();
+      i++;
+    } else {
+      clearInterval(timer);
+      unlockAchievement('aiSkeptic','🤖','AI Skeptic No More');
+      setTimeout(()=>goToQuestion(n+1), 500);
+    }
+  }, 450);
+}
+
+/* ===================== FINAL CHASE SCREEN ===================== */
+const infjBtn = document.getElementById('infjBtn');
+const infpBtn = document.getElementById('infpBtn');
+const chaseArea = document.getElementById('chaseArea');
+
+function showFinalChase(){
+  showScreen('finalQuestion');
+  applyChaseState();
+}
+
+function randomPosInArea(btnW, btnH){
+  const areaW = chaseArea.clientWidth || 400;
+  const areaH = chaseArea.clientHeight || 340;
+  const maxX = Math.max(10, areaW - btnW - 10);
+  const maxY = Math.max(10, areaH - btnH - 10);
+  return { left: Math.random()*maxX, top: Math.random()*maxY };
+}
+
+const CHASE_WRONG_POPUPS = [
+  "The evidence avoided your click.",
+  "The button refuses to cooperate.",
+  "It seems INFJ has left the building.",
+  "Persistent! But the button is faster.",
+  "Almost! The button disagrees.",
+  "The button has filed for asylum.",
+  "Evidence Bureau: nice try.",
+  "The button just got a promotion: professional dodger."
+];
+
+function applyChaseState(){
+  const n = state.infjClicks;
+  let w=120,h=56,fontSize=16;
+  let infjOpacity=1;
+
+  if(n>=3){ w=Math.max(60,120-n*4); h=Math.max(34,56-n*1.5); fontSize=Math.max(10,16-n*0.4); }
+  if(n>=9){ infjOpacity = Math.max(0.15, 1-(n-8)*0.08); }
+
+  infjBtn.style.width=w+'px';
+  infjBtn.style.height=h+'px';
+  infjBtn.style.fontSize=fontSize+'px';
+  infjBtn.style.opacity=infjOpacity;
+
+  const growth = Math.min(6, n*0.5);
+  const infpScale = 1+growth*0.35;
+  infpBtn.style.width=(120*infpScale)+'px';
+  infpBtn.style.height=(56*infpScale)+'px';
+  infpBtn.style.fontSize=(16*Math.min(2.4,1+growth*0.18))+'px';
+
+  if(n===0){
+    infjBtn.style.left='30%'; infjBtn.style.top='40%'; infjBtn.style.transform='translate(-50%,-50%)';
+    infpBtn.style.left='65%'; infpBtn.style.top='40%'; infpBtn.style.transform='translate(-50%,-50%)';
+  } else {
+    const pos = randomPosInArea(w,h);
+    infjBtn.style.left=pos.left+'px';
+    infjBtn.style.top=pos.top+'px';
+    infjBtn.style.transform='none';
+  }
+}
+
+infjBtn.addEventListener('click', function(e){
+  state.infjClicks++;
+  saveState();
+  SFX.whoosh();
+
+  if(state.infjClicks===1) unlockAchievement('chaser','🏃','Button Chaser');
+  if(state.infjClicks>=6 && !state.achievements['evidenceIgnorer']) unlockAchievement('evidenceIgnorer','🤷','Evidence Ignorer');
+
+  if(state.infjClicks===20){
+    unlockAchievement('persistent','🏆','Persistent Human');
+    showToast('You have defended your answer with remarkable dedication. The verdict, however, remains unchanged.');
+  } else {
+    showToast(CHASE_WRONG_POPUPS[Math.floor(Math.random()*CHASE_WRONG_POPUPS.length)]);
+  }
+
+  if(state.infjClicks===8){
+    document.getElementById('app').classList.add('screenshake');
+    setTimeout(()=>document.getElementById('app').classList.remove('screenshake'),300);
+  }
+  if(state.infjClicks % 7 === 0) chaseCardShake();
+
+  applyChaseState();
+});
+
+function chaseCardShake(){
+  const c = document.getElementById('chaseCard');
+  c.classList.add('shake');
+  setTimeout(()=>c.classList.remove('shake'), 400);
+}
+
+infpBtn.addEventListener('click', function(e){
+  SFX.celebrate();
+  unlockAchievement('investigationComplete','🎉','Investigation Complete');
+  state.completed = true;
+  saveState();
+  runPrintingScene();
+});
+
+/* ===================== PRINTING SCENE ===================== */
+function runPrintingScene(){
+  showScreen('printing');
+  const page = document.getElementById('printerPage');
+  const msgEl = document.getElementById('printingMsg');
+  page.style.animation = 'none';
+  void page.offsetWidth;
+  page.style.animation = '';
+  SFX.printer();
+  let dots = 0;
+  const dotTimer = setInterval(()=>{
+    dots = (dots+1)%4;
+    msgEl.textContent = 'Printing Report' + '.'.repeat(dots);
+  }, 300);
+  setTimeout(()=>{
+    clearInterval(dotTimer);
+    msgEl.textContent = 'Report Ready.';
+    setTimeout(()=>{
+      runWindowsNotification();
+      runVictory();
+    }, 600);
+  }, 2300);
+}
+
+/* ===================== WINDOWS NOTIFICATION ===================== */
+function runWindowsNotification(){
+  const wt = document.getElementById('winToast');
+  SFX.notif();
+  wt.classList.add('show');
+  setTimeout(()=>wt.classList.remove('show'), 4200);
+}
+
+/* ===================== VICTORY SEQUENCE ===================== */
+function runVictory(){
+  showScreen('victory');
+  SFX.drumroll();
+  launchConfetti();
+  victoryPulse();
+
+  const titleEl = document.getElementById('victoryTitle');
+  const subEl = document.getElementById('victorySub');
+  const verdictEl = document.getElementById('finalVerdict');
+  const whisperEl = document.getElementById('whisperMsg');
+  verdictEl.style.display='none';
+  verdictEl.innerHTML='';
+  whisperEl.classList.remove('show');
+
+  titleEl.textContent = '';
+  typewrite(titleEl, 'Investigation Complete', 45, ()=>{
+    subEl.textContent = 'Preparing Final Report...';
+    setTimeout(()=>{
+      subEl.textContent = 'Generating Verdict...';
+      setTimeout(()=>{
+        subEl.textContent='';
+        verdictEl.style.display='block';
+        runFinalReportTypewriter(verdictEl, whisperEl);
+      }, 1300);
+    }, 1100);
+  });
+}
+
+function victoryPulse(){
+  const card = document.querySelector('#screen-victory .card');
+  card.style.transform='scale(0.96)';
+  card.style.transition='transform .5s cubic-bezier(.34,1.56,.64,1)';
+  requestAnimationFrame(()=>{
+    setTimeout(()=>{ card.style.transform='scale(1)'; }, 30);
+  });
+}
+
+/* realistic line-by-line typewriter for the final report */
+function runFinalReportTypewriter(container, whisperEl){
+  const lines = [
+    { text:`Dear ${CONFIG.suspectName},`, pause:500 },
+    { text:'After reviewing', pause:300 },
+    { text:'✔ Previous Personality Test', pause:200, indent:true },
+    { text:'✔ Latest Personality Test', pause:200, indent:true },
+    { text:'✔ Instagram Evidence', pause:200, indent:true },
+    { text:'✔ Student Observation', pause:200, indent:true },
+    { text:'✔ AI Analysis', pause:200, indent:true },
+    { text:'✔ Common Sense', pause:500, indent:true },
+    { text:'our investigation has reached a unanimous conclusion.', pause:900 }
+  ];
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){
+      revealBugBox(container, whisperEl);
+      return;
+    }
+    const p = document.createElement('p');
+    if(lines[i].indent) p.style.margin = '2px 0 2px 8px';
+    p.style.margin = p.style.margin || '4px 0';
+    container.appendChild(p);
+    typewrite(p, lines[i].text, lines[i].indent ? 16 : 26, ()=>{
+      SFX.tick();
+      const wait = lines[i].pause || 200;
+      i++;
+      setTimeout(nextLine, wait);
+    });
+  }
+  nextLine();
+}
+
+function revealBugBox(container, whisperEl){
+  const box = document.createElement('div');
+  box.className = 'bug-box';
+  box.innerHTML = `
+    <div>🐞 Your Instagram bio contains one tiny bug.</div>
+    <div style="margin-top:10px;">Current: <span class="bug-from">${CONFIG.currentBio}</span></div>
+    <div id="bugRecommend">Recommended: <span class="suspense-cursor"></span></div>
+  `;
+  container.appendChild(box);
+  requestAnimationFrame(()=>box.classList.add('show'));
+  SFX.beep();
+
+  // 2-second suspenseful pause with blinking cursor before reveal
+  setTimeout(()=>{
+    const target = document.getElementById('bugRecommend');
+    target.innerHTML = `Recommended: <span class="bug-to" id="recommendedReveal"></span>`;
+    const revealSpan = document.getElementById('recommendedReveal');
+    SFX.whooshUp();
+    typewrite(revealSpan, CONFIG.recommendedBio, 90, ()=>{
+      SFX.celebrate();
+      finishReport(container, whisperEl);
+    });
+  }, 2000);
+}
+
+function finishReport(container, whisperEl){
+  const closing = document.createElement('p');
+  closing.style.textAlign='center';
+  closing.style.marginTop='16px';
+  container.appendChild(closing);
+  typewrite(closing, `Please update your Instagram bio. This bug has been officially reported by ${CONFIG.reporterName}.`, 20, ()=>{
+    const caseClosed = document.createElement('p');
+    caseClosed.style.textAlign='center';
+    caseClosed.style.fontWeight='700';
+    caseClosed.style.marginTop='10px';
+    container.appendChild(caseClosed);
+    typewrite(caseClosed, 'Case Closed. 🎉', 35, ()=>{
+      SFX.celebrate();
+      launchConfetti(true);
+      setTimeout(()=>{
+        whisperEl.classList.add('show');
+      }, 3000);
+    });
+  });
+}
+
+/* ===================== CONFETTI ===================== */
+const confettiCanvas = document.getElementById('confettiCanvas');
+const ctx2d = confettiCanvas.getContext('2d');
+function resizeCanvas(){
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function launchConfetti(big){
+  const colors = ['#c9b6f0','#ffc2dd','#bcd4ff','#ff9ec7','#fff3b0','#a98ce0','#ffffff'];
+  const count = big ? 320 : 220;
+  const pieces = [];
+  for(let i=0;i<count;i++){
+    pieces.push({
+      x: Math.random()*confettiCanvas.width,
+      y: -20-Math.random()*250,
+      r: 4+Math.random()*7,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      speedY: 2+Math.random()*4,
+      speedX: -2+Math.random()*4,
+      rot: Math.random()*360,
+      rotSpeed: -8+Math.random()*16,
+      shape: Math.random()>0.5 ? 'rect':'circle'
+    });
+  }
+  let frame = 0;
+  const maxFrames = big ? 300 : 220;
+  function animate(){
+    ctx2d.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+    pieces.forEach(p=>{
+      p.x += p.speedX;
+      p.y += p.speedY;
+      p.rot += p.rotSpeed;
+      ctx2d.save();
+      ctx2d.translate(p.x,p.y);
+      ctx2d.rotate(p.rot*Math.PI/180);
+      ctx2d.fillStyle = p.color;
+      if(p.shape==='rect'){
+        ctx2d.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.6);
+      } else {
+        ctx2d.beginPath();
+        ctx2d.arc(0,0,p.r/2,0,Math.PI*2);
+        ctx2d.fill();
+      }
+      ctx2d.restore();
+    });
+    frame++;
+    if(frame<maxFrames){
+      requestAnimationFrame(animate);
+    } else {
+      ctx2d.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+    }
+  }
+  animate();
+}
+
+/* ===================== EASTER EGGS ===================== */
+let idleTimer = null;
+function resetIdleTimer(){
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(()=>{
+    if(screens.question.classList.contains('active') || screens.finalQuestion.classList.contains('active')){
+      showToast(ENCOURAGEMENT[Math.floor(Math.random()*ENCOURAGEMENT.length)]);
+    }
+  }, 20000);
+}
+['mousemove','keydown','click','touchstart'].forEach(evt=>{
+  document.addEventListener(evt, resetIdleTimer, {passive:true});
+});
+resetIdleTimer();
+
+let clickTimestamps = [];
+document.addEventListener('click', ()=>{
+  const now = Date.now();
+  clickTimestamps.push(now);
+  clickTimestamps = clickTimestamps.filter(t=>now-t<1500);
+  if(clickTimestamps.length>=6){
+    showToast('Please stop interrogating the buttons.');
+    clickTimestamps = [];
+  }
+});
+
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Escape'){
+    e.preventDefault();
+    showToast('Escape denied.');
+    return;
+  }
+  // Ctrl+Shift+P -> jump to final report
+  if(e.ctrlKey && e.shiftKey && (e.key==='P' || e.key==='p')){
+    e.preventDefault();
+    ensureCtx();
+    state.completed = true;
+    saveState();
+    runPrintingScene();
+    return;
+  }
+  // Ctrl+Shift+R -> reset investigation
+  if(e.ctrlKey && e.shiftKey && (e.key==='R' || e.key==='r')){
+    e.preventDefault();
+    if(confirm('Reset the entire investigation? This clears all progress.')){
+      try{ localStorage.removeItem(STORAGE_KEY); }catch(err){}
+      location.reload();
+    }
+  }
+});
+
+document.addEventListener('contextmenu', (e)=>{
+  e.preventDefault();
+  const msgEl = document.getElementById('contextMsg');
+  msgEl.textContent = 'Looking for Developer Tools? Too late — the investigation has already been developed.';
+  msgEl.classList.add('show');
+  setTimeout(()=>msgEl.classList.remove('show'), 2000);
+});
+
+document.addEventListener('copy', ()=>{
+  showToast('You may copy the evidence. The verdict, however, remains unchanged.');
+});
+
+/* ===================== RESET BUTTON ===================== */
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(confirm('Reset the entire investigation? This clears all progress.')){
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+    location.reload();
+  }
+});
+
+/* ===================== RESTORE PROGRESS ===================== */
+function restoreProgress(){
+  if(!state.introSeen){
+    cinemaOverlay.style.display='flex';
+    cinemaOverlay.classList.remove('fading');
+  } else {
+    cinemaOverlay.style.display='none';
+  }
+
+  if(state.completed){
+    runCinematicIntro(()=>{
+      showScreen('victory');
+      document.getElementById('victoryTitle').textContent='Investigation Complete';
+      document.getElementById('victorySub').textContent='';
+      const verdictEl = document.getElementById('finalVerdict');
+      verdictEl.style.display='block';
+      verdictEl.innerHTML = `
+        <p>Dear ${CONFIG.suspectName},</p>
+        <p>After reviewing</p>
+        <p style="margin-left:8px;">✔ Previous Personality Test<br>
+        ✔ Latest Personality Test<br>
+        ✔ Instagram Evidence<br>
+        ✔ Student Observation<br>
+        ✔ AI Analysis<br>
+        ✔ Common Sense</p>
+        <p>our investigation has reached a unanimous conclusion.</p>
+        <div class="bug-box show">
+          <div>🐞 Your Instagram bio contains one tiny bug.</div>
+          <div style="margin-top:10px;">Current: <span class="bug-from">${CONFIG.currentBio}</span></div>
+          <div>Recommended: <span class="bug-to">${CONFIG.recommendedBio}</span></div>
+        </div>
+        <p style="text-align:center;">Please update your Instagram bio. This bug has been officially reported by ${CONFIG.reporterName}.</p>
+        <p style="text-align:center;font-weight:700;">Case Closed. 🎉</p>
+      `;
+      document.getElementById('whisperMsg').classList.add('show');
+    });
+    return;
+  }
+
+  if(state.started){
+    runCinematicIntro(()=>{
+      if(!state.welcomeShown){
+        showWelcomeBack();
+      }
+      if(state.currentQuestion > TOTAL_QUESTIONS){
+        showFinalChase();
+      } else {
+        goToQuestion(state.currentQuestion || 1);
+      }
+    });
+  }
+  // else stay on intro screen, cinema will play once "Begin" leads forward (cinema plays before folder on first run too)
+}
+
+function showWelcomeBack(){
+  const msgEl = document.getElementById('contextMsg');
+  msgEl.textContent = 'Welcome back. The evidence missed you.';
+  msgEl.classList.add('show');
+  state.welcomeShown = true;
+  saveState();
+  setTimeout(()=>msgEl.classList.remove('show'), 2000);
+}
+
+// If this is a brand-new visit (not started), still show the cinematic intro
+// once before the case-file screen, then let Begin Investigation proceed normally.
+if(!state.started && !state.introSeen){
+  runCinematicIntro(()=>{ /* cinema finished, intro screen already visible underneath */ });
+} else if(!state.started && state.introSeen){
+  cinemaOverlay.style.display='none';
+}
+
+restoreProgress();
+
+})();
+</script>
+</body>
+</html>
